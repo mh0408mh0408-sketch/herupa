@@ -1119,6 +1119,142 @@ body.shake-screen {
   margin-left: 0.35rem;
 }
 
+
+/* ============================================================
+   【コンパクト1画面レイアウト】スクロール／スワイプ不要で
+   天候・資源・生存者・操作・ログ・手札が一度に見えるようにする
+   ============================================================ */
+body.tab-game.board-active { overflow: hidden; }
+body.tab-game .app-container { padding: 6px 8px; max-width: none; }
+body.tab-game.board-active .top-navbar { padding: 0.3rem 0.6rem; gap: 0.4rem; }
+body.tab-game.board-active .brand-logo { font-size: 1rem; }
+body.tab-game.board-active .brand-logo small,
+body.tab-game.board-active .brand-badge,
+body.tab-game.board-active .firebase-status-pill { display: none; }
+body.tab-game.board-active .nav-tab-btn { padding: 0.3rem 0.55rem; font-size: 0.74rem; }
+
+.gs {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  height: calc(100vh - var(--nav-h, 56px) - 14px);
+  height: calc(100dvh - var(--nav-h, 56px) - 14px);
+  min-height: 0;
+  overflow: hidden;
+}
+.gs > * { flex: 0 0 auto; }
+.gs .btn { padding: 0.4rem 0.75rem; font-size: 0.78rem; border-radius: 8px; }
+.gs .btn.tiny, .btn.tiny { padding: 0.22rem 0.5rem; font-size: 0.7rem; border-radius: 7px; }
+.gs-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border-sand);
+  border-radius: 12px;
+  padding: 6px 8px;
+  min-width: 0;
+}
+.gs-scroll { flex: 1 1 0 !important; min-height: 0; overflow-y: auto; }
+.gs-mid {
+  flex: 1 1 0 !important;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  gap: 6px;
+}
+.gs-col { min-height: 0; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.gs-col > .gs-box:not(.gs-scroll):not(.gs-log) { flex: 0 0 auto; }
+.gs-log { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; }
+.gs-log .log-box { height: auto; flex: 1 1 0; min-height: 0; font-size: 0.74rem; padding: 0.4rem; gap: 0.25rem; }
+.gs-log .log-entry { padding: 0.2rem 0.4rem; }
+.gs-hand { max-height: 34%; display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
+
+/* ステータスバー */
+.gs-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)) auto; gap: 5px; min-width: 0; }
+.st {
+  display: flex; align-items: center; gap: 6px; padding: 4px 8px;
+  background: var(--bg-card); border: 1px solid var(--border-sand); border-radius: 10px; min-width: 0; overflow: hidden;
+}
+.st > div { min-width: 0; flex: 1 1 0; overflow: hidden; }
+.st .ic { font-size: 1.3rem; line-height: 1; flex-shrink: 0; }
+.st .lb { font-size: 0.62rem; color: var(--text-muted); font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.st .vl { font-size: 0.98rem; font-weight: 900; line-height: 1.15; white-space: nowrap; }
+.st .sb { font-size: 0.62rem; color: #cbd5e1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gs-exit {
+  background: rgba(239, 68, 68, 0.18); border: 1px solid rgba(239, 68, 68, 0.5); color: #fff;
+  border-radius: 10px; padding: 0 0.6rem; font-size: 1rem; cursor: pointer; flex-shrink: 0;
+}
+
+/* 生存者チップ */
+.gs-sv { display: flex; flex-wrap: wrap; gap: 4px; }
+.sv {
+  display: flex; align-items: center; gap: 5px; padding: 3px 7px; border-radius: 10px; min-width: 0;
+  border: 1.5px solid rgba(255, 255, 255, 0.14); background: rgba(15, 34, 52, 0.88);
+}
+.sv.turn { border-color: var(--accent-gold); box-shadow: 0 0 10px rgba(245, 158, 11, 0.5); background: rgba(245, 158, 11, 0.16); }
+.sv.me { border-left: 4px solid #38bdf8; }
+.sv.dead { opacity: 0.45; filter: grayscale(0.85); }
+.sv.poison { border-color: var(--accent-poison); }
+.sv-av { font-size: 1.15rem; line-height: 1; }
+.sv-name { font-size: 0.72rem; font-weight: 800; max-width: 84px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sv-sub { font-size: 0.64rem; color: var(--text-muted); white-space: nowrap; }
+
+/* アクション */
+.phase-title { font-size: 0.86rem; font-weight: 800; color: var(--accent-sand); margin-bottom: 4px; }
+.phase-note { font-size: 0.72rem; color: #cbd5e1; margin: 2px 0 6px; }
+.act-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 5px; }
+.act {
+  display: flex; flex-direction: column; gap: 2px; padding: 6px 7px; border-radius: 10px; cursor: pointer;
+  background: rgba(255, 255, 255, 0.05); border: 1.5px solid rgba(255, 255, 255, 0.16); transition: all 0.15s;
+}
+.act:hover:not(.disabled) { border-color: var(--accent-gold); background: rgba(245, 158, 11, 0.14); }
+.act.disabled { opacity: 0.45; cursor: not-allowed; }
+.act .t { font-size: 0.8rem; font-weight: 800; color: var(--accent-sand); }
+.act .d { font-size: 0.64rem; color: #cbd5e1; }
+.act .e { font-size: 0.74rem; font-weight: 900; }
+.act .wood-count-selector { margin-top: 2px; gap: 3px; }
+.act .wood-num-btn { padding: 0.2rem 0; font-size: 0.7rem; min-width: 22px; }
+
+/* 会議・投票 */
+.gs .survival-vote-panel { padding: 0.5rem; margin: 0; }
+.gs .vote-targets-grid { grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 4px; margin: 0.35rem 0; }
+.gs .vote-target-btn { padding: 0.35rem 0.5rem; font-size: 0.76rem; }
+.gs .escape-ready-banner, .gs .hurricane-alert-banner { padding: 0.3rem 0.7rem; margin: 0; border-radius: 10px; }
+
+/* クイックアイテムバー / 交換バナー */
+.qbar {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin-top: 6px; padding: 5px 7px;
+  border-radius: 10px; background: rgba(15, 23, 42, 0.78); border: 1px dashed rgba(245, 158, 11, 0.5);
+}
+.qbar-label { font-size: 0.7rem; font-weight: 800; color: var(--accent-sand); }
+.trade-banner {
+  background: rgba(56, 189, 248, 0.14); border: 1.5px solid #38bdf8; border-radius: 10px;
+  padding: 5px 8px; font-size: 0.76rem;
+}
+.trade-banner.dim { opacity: 0.75; border-style: dashed; }
+
+/* 手札（コンパクトカード） */
+.hand-row { display: flex; flex-wrap: wrap; gap: 5px; overflow-y: auto; min-height: 0; }
+.hc {
+  position: relative; width: 92px; padding: 4px 4px 5px; border-radius: 10px; border: 2px solid var(--cc, #f59e0b);
+  background: linear-gradient(160deg, #1e293b, #0f172a); display: flex; flex-direction: column; align-items: center; gap: 2px;
+}
+.hc-icon { font-size: 1.4rem; line-height: 1; }
+.hc-name { font-size: 0.68rem; font-weight: 800; color: var(--accent-sand); text-align: center; line-height: 1.15; }
+.hc-btn { padding: 0.2rem 0.3rem !important; font-size: 0.64rem !important; width: 100%; }
+.hc-info { position: absolute; top: 1px; right: 3px; background: none; border: none; color: #94a3b8; font-size: 0.72rem; cursor: pointer; }
+
+@media (max-width: 800px) {
+  .gs-mid { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1.5fr) minmax(0, 0.8fr); }
+  .act-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .act .d { display: none; }
+  .gs-stats { gap: 3px; }
+  .st { padding: 3px 5px; gap: 4px; }
+  .st .ic { font-size: 1.05rem; }
+  .st .vl { font-size: 0.86rem; }
+  .hc { width: 78px; }
+  .gs-hand { max-height: 30%; }
+  .gs .bluff-quick-row .bluff-chip:nth-child(n+3) { display: none; }
+  .nav-actions .nav-tab-btn { padding: 0.25rem 0.45rem; }
+}
 </style>
 </head>
 <body>
@@ -1317,8 +1453,8 @@ body.shake-screen {
           <div class="panel-title">2. ゲームの準備（セットアップ）</div>
           <ol class="rule-step-list">
             <li><strong>1. ボードを広げる：</strong>「水トラック」と「食料トラック」に、<strong>現在の生存者数と同じ数</strong>にマーカーを置きます。</li>
-            <li><strong>2. 木材袋を作る：</strong>袋に茶色い木材コマ（5個）と黒いヘビコマ（1個）を入れます。</li>
-            <li><strong>3. 難破船カード（手札）の配布：</strong>全員に<strong>裏向きで3枚ずつ</strong>配ります（手札は非公開）。</li>
+            <li><strong>2. 木材袋を作る：</strong>袋に茶色い木材ボール5個と黒いヘビボール1個（計6個）を入れます。</li>
+            <li><strong>3. 難破船カード（手札）の配布：</strong>全員に<strong>裏向きで最大3枚ずつ</strong>配ります（手札は非公開）。本アプリでは待機ロビーで<strong>初手の枚数（0〜3枚・初期値0枚）</strong>を選べます。</li>
             <li><strong>4. 天候デッキの準備：</strong>最初の6ターン（ラウンド1〜6）には嵐（ハリケーン）が出ないようにし、後半（ラウンド7〜12）のどこかにランダムで「ハリケーンカード」を混ぜ込みます。</li>
             <li><strong>5. スタートプレイヤーの決定：</strong>最初のプレイヤーを決め、スタートプレイヤーマーカー（👑）を渡します。</li>
           </ol>
@@ -1371,7 +1507,7 @@ body.shake-screen {
             <tr>
               <td><strong>🪵 ③ 木材を集める</strong></td>
               <td>
-                「何個引くか（1〜5個）」宣言し、木材袋から引く。<br />
+                「何個引くか（1〜5個）」宣言し、木材袋（木材5個＋ヘビ1個）から引く。<br />
                 ・全て茶色ならその数だけ木材獲得（<strong>木材6個でイカダ1艘完成</strong>）。<br />
                 ・<strong style="color:#fca5a5;">黒（ヘビ🐍）を引くと失敗！</strong> 木材は得られず<strong>毒状態</strong>になる（次のラウンド行動不能）。
               </td>
@@ -1435,9 +1571,19 @@ body.shake-screen {
         </div>
 
         <div class="panel-card">
+          <div class="panel-title">🛠️ このアプリ独自の追加ルール</div>
+          <ul class="rule-step-list">
+            <li><strong>🃏 初手の手札：</strong>待機ロビーで0〜3枚を選択（初期値0枚）。</li>
+            <li><strong>🛡️ 最初の6ターン：</strong>ラウンド1〜6は嵐（ハリケーン）が出ません。</li>
+            <li><strong>⚡ アイテム・銃：</strong>演出中以外ならいつでも（会議中・他人の手番でも）使えます。</li>
+            <li><strong>🤝 カードの交換・譲渡：</strong>手札1枚を相手に譲渡、または交換を提案できます（相手が手札から1枚選んで承諾すると成立）。</li>
+          </ul>
+        </div>
+
+        <div class="panel-card">
           <div class="panel-title">🔓 Firebase Realtime Database 公開ルール設定</div>
           <p style="font-size:0.82rem;color:#cbd5e1;margin-bottom:0.5rem;">
-            プロジェクト <code>herupa-a2ee6</code> の Realtime Database ルール（公開設定 <code>database.rules.json</code>）：
+            プロジェクト <code>herupa-a2ee6</code> の Realtime Database ルール（公開設定）：
           </p>
           <pre style="background:rgba(0,0,0,0.45);padding:0.8rem;border-radius:10px;font-size:0.78rem;color:#6ee7b7;overflow-x:auto;">{
   "rules": {
@@ -1839,7 +1985,7 @@ const CARD_CATALOG = [
     color: '#f59e0b',
     consumable: true,
     timing: 'いつでも使用可（日中・会議中など常時）',
-    desc: '使うと即座に「完成イカダ＋1艘（または木材＋2個）」として島に貢献できる特別アイテム！'
+    desc: '木材1個分として使える（使うと木材＋1個。6個でイカダ1艘完成）。脱出に向けたイカダ作りの推進力になる！'
   },
 
   // ④ 特殊効果（計3枚）
@@ -1854,7 +2000,7 @@ const CARD_CATALOG = [
     color: '#6366f1',
     consumable: true,
     timing: 'いつでも使用可（日中・会議中・処刑直前など常時）',
-    desc: '使ったラウンドの夜は、自分だけ「水と食料の消費なし」で生き残れ、生贄投票の対象からも免除される！'
+    desc: '使った夜は、自分だけ「水と食料の消費なし」で生き残れる（その夜の必要数が1人分減る）。'
   },
   {
     typeId: 'club',
@@ -2095,6 +2241,8 @@ window.GameData = {
   // ============================================================
   window.switchMainTab = function (tabName) {
     window.SFX.play('click');
+    document.body.classList.toggle('tab-game', tabName === 'game');
+    setTimeout(updateLayoutVars, 0);
     document.querySelectorAll('.nav-tab-btn[data-tab]').forEach(btn => {
       btn.classList.toggle('active', btn.dataset.tab === tabName);
     });
@@ -2312,7 +2460,7 @@ window.GameData = {
         if (players.length < 12) {
           const newPlayer = createPlayerObject(myClientId, AppState.myName, AppState.myAvatar, false, null);
           const deck = normalizeArray(room.wreckageDeck);
-          newPlayer.hand = deck.splice(0, 3);
+          newPlayer.hand = deck.splice(0, Math.max(0, Math.min(3, Number(room.initialHandSize) || 0)));
           players.push(newPlayer);
           const logs = normalizeArray(room.logs);
           logs.unshift({
@@ -2436,7 +2584,9 @@ window.GameData = {
       water: room.players.length,
       food: room.players.length,
       wood: 0,
-      rafts: 0
+      rafts: 0,
+      bagWood: 5,
+      bagSnake: 1
     };
     return room;
   }
@@ -2572,22 +2722,29 @@ window.GameData = {
       ensureFirstSixTurnsNoHurricane(weatherDeck);
 
       const playerCount = draft.players.length;
+      // 初手の手札枚数（ロビーで0〜3枚を選択。初期値は0枚）
+      const handSize = Math.max(0, Math.min(3, Number(draft.initialHandSize) || 0));
 
       draft.players = draft.players.map(p => ({
         ...p,
         alive: true,
         poisoned: false,
+        poisonedRound: 0,
         sleepingBagTonight: false,
         actedThisRound: false,
-        hand: wreckageDeck.splice(0, 3)
+        hand: wreckageDeck.splice(0, handSize)
       }));
 
+      // 木材袋：茶色の木材ボール5個＋黒いヘビボール1個（計6個）
       draft.board = {
         water: playerCount,
         food: playerCount,
         wood: 0,
-        rafts: 0
+        rafts: 0,
+        bagWood: 5,
+        bagSnake: 1
       };
+      draft.tradeOffer = null;
 
       draft.wreckageDeck = wreckageDeck;
       draft.weatherDeck = weatherDeck;
@@ -2603,7 +2760,7 @@ window.GameData = {
       draft.tiedIds = [];
 
       const starter = draft.players[draft.startPlayerIndex];
-      addLog(draft, 'success', `🏝️ サバイバル開始！生存者${playerCount}人。初期の水:${playerCount} / 食料:${playerCount}（最初の6ターンは嵐が来ない安全期間です）。`);
+      addLog(draft, 'success', `🏝️ サバイバル開始！生存者${playerCount}人。初期の水:${playerCount} / 食料:${playerCount} / 初手の手札:${handSize}枚（最初の6ターンは嵐が来ない安全期間です）。`);
       addLog(draft, 'warn', `👑 最初のスタートプレイヤーは ${starter.name} です！`);
       addLog(draft, 'chat', `🌦️ ラウンド1の天候：「${draft.currentWeather.label}」`);
 
@@ -2702,10 +2859,10 @@ window.GameData = {
     });
   };
 
-  // ③ 木材を集める
+  // ③ 木材を集める（木材5個＋ヘビ1個の袋から1〜5個引く）
   window.actionGatherWood = function (declareCount) {
     if (AppState.isProcessingAnimation) return;
-    const count = Math.max(1, Math.min(6, Number(declareCount) || 1));
+    const count = Math.max(1, Math.min(5, Number(declareCount) || 1));
     const game = AppState.game;
     const actor = game?.players[game.currentTurnIndex];
     if (!actor || game.phase !== 'action') return;
@@ -2718,7 +2875,7 @@ window.GameData = {
       const drawnSequence = [];
       let bittenBySnake = false;
 
-      for (let i = 0; i < count; i++) {
+      for (let i = 0; i < count && i < bag.length; i++) {
         const piece = bag[i];
         drawnSequence.push(piece);
         if (piece === 'snake') {
@@ -2731,6 +2888,7 @@ window.GameData = {
 
       if (bittenBySnake) {
         p.poisoned = true;
+        p.poisonedRound = draft.round || 1;
         addLog(draft, 'danger', `🐍 ぎゃあああ！ ${p.name} は木材を ${count}個 取ろうとして【黒いヘビ】を引いた！木材は0個、毒状態（次ラウンド行動不能）に！`);
         setLastEvent(draft, 'wood_draw', {
           actorName: p.name,
@@ -2880,17 +3038,28 @@ window.GameData = {
         for (const [vId, tId] of Object.entries(draft.votes || {})) {
           const vP = draft.players.find(p => p.id === vId);
           const tP = draft.players.find(p => p.id === tId);
-          if (vP && vP.alive && tP && tP.alive && !tP.sleepingBagTonight) {
+          if (vP && vP.alive && tP && tP.alive) {
             cleanVotes[vId] = tId;
           }
         }
         draft.votes = cleanVotes;
         if (draft.condemnedId) {
           const cond = draft.players.find(p => p.id === draft.condemnedId);
-          if (!cond || !cond.alive || cond.sleepingBagTonight) {
+          if (!cond || !cond.alive) {
             draft.condemnedId = null;
             draft.survivalStep = 'vote';
           }
+        }
+        if (draft.survivalStep === 'tiebreak') {
+          draft.tiedIds = (draft.tiedIds || []).filter(id => draft.players.find(p => p.id === id && p.alive));
+          if (draft.tiedIds.length < 2) {
+            draft.tiedIds = [];
+            draft.votes = {};
+            draft.survivalStep = 'vote';
+          }
+        }
+        if (draft.survivalStep === 'counter_window' && !draft.condemnedId) {
+          draft.survivalStep = 'vote';
         }
       }
       if (logEntry) {
@@ -2913,11 +3082,8 @@ window.GameData = {
         return;
       }
 
-      draft.board.water -= needed;
-      draft.board.food -= needed;
-      addLog(draft, 'success', `🌙 夜を越しました（水-${needed} / 食料-${needed} 消費 → 残り水:${draft.board.water}, 食料:${draft.board.food}）`);
-
-      // ハリケーンラウンドだった場合、脱出条件を満たせるか最終チェック
+      // ハリケーンラウンドだった場合、ラウンドの終わりに脱出条件を満たせているか最終チェック
+      // （水・食料は夜に消費せず、脱出用の1人各1個として扱う）
       if (draft.currentWeather && draft.currentWeather.hurricane) {
         if (canEscapeNow(draft)) {
           executeIslandEscape(draft);
@@ -2932,11 +3098,16 @@ window.GameData = {
         return;
       }
 
+      draft.board.water -= needed;
+      draft.board.food -= needed;
+      addLog(draft, 'success', `🌙 夜を越しました（水-${needed} / 食料-${needed} 消費 → 残り水:${draft.board.water}, 食料:${draft.board.food}）`);
+
       // フェーズ4：一日の終わり（クリンナップ）
       draft.players.forEach(p => {
-        if (p.alive && p.poisoned) {
+        // 毒を受けたラウンドの次のラウンド（行動不能）が終わるクリンナップで回復する
+        if (p.alive && p.poisoned && (p.poisonedRound || 0) < (draft.round || 1)) {
           p.poisoned = false;
-          addLog(draft, 'success', `✨ ${p.name} がヘビの毒から回復しました！`);
+          addLog(draft, 'success', `✨ ${p.name} がヘビの毒から回復しました！（次のラウンドから行動可能）`);
         }
         p.sleepingBagTonight = false;
         p.actedThisRound = false;
@@ -3001,7 +3172,7 @@ window.GameData = {
       // まだ未投票のCPUやプレイヤーがいれば自動補完
       for (const voter of aliveVoters) {
         if (!draft.votes[voter.id]) {
-          const candidates = aliveVoters.filter(p => p.id !== voter.id && !p.sleepingBagTonight);
+          const candidates = aliveVoters.filter(p => p.id !== voter.id);
           const pick = candidates[Math.floor(Math.random() * candidates.length)] || aliveVoters[0];
           draft.votes[voter.id] = pick.id;
         }
@@ -3073,6 +3244,7 @@ window.GameData = {
       draft.condemnedId = null;
       draft.votes = {};
       draft.tiedIds = [];
+      draft.survivalStep = 'vote';
 
       evaluateSurvivalStatus(draft, true);
     });
@@ -3085,6 +3257,9 @@ window.GameData = {
     victim.alive = false;
     victim.poisoned = false;
     victim.sleepingBagTonight = false;
+    if (draft.tradeOffer && (draft.tradeOffer.fromId === deadPlayerId || draft.tradeOffer.toId === deadPlayerId)) {
+      draft.tradeOffer = null;
+    }
 
     const survivors = draft.players.filter(p => p.alive);
     const lootCards = [...victim.hand];
@@ -3188,7 +3363,7 @@ window.GameData = {
         break;
 
       case 'paddle':
-        openPaddleModal(ownerId, cardUid);
+        window.resolvePaddle(ownerId, cardUid, 'wood');
         break;
 
       case 'sleeping_bag':
@@ -3197,7 +3372,7 @@ window.GameData = {
           const p = draft.players.find(x => x.id === ownerId);
           removeCardByUid(p, cardUid);
           p.sleepingBagTonight = true;
-          addLog(draft, 'success', `🛌 ${p.name} が【寝袋】を使用！ 今夜は水と食料を消費せず、生贄投票の対象からも免除されます！`);
+          addLog(draft, 'success', `🛌 ${p.name} が【寝袋】を使用！ 今夜は自分の分の水と食料を消費しません！`);
           if (draft.phase === 'survival') evaluateSurvivalStatus(draft, true);
         });
         break;
@@ -3289,26 +3464,6 @@ window.GameData = {
     });
   };
 
-  // 🛶 パドル使用モーダル（イカダ＋1艘 または 木材＋2個）
-  function openPaddleModal(ownerId, cardUid) {
-    openItemActionModal(`
-      <div style="font-size:2.6rem;">🛶</div>
-      <h3 style="color:#fde68a;margin:0.4rem 0;">カヌーのパドルを使用</h3>
-      <p style="font-size:0.86rem;color:#cbd5e1;margin-bottom:1rem;">
-        パドルの使い道を選んでください（どちらを選んでも今すぐ効果を発揮します）：
-      </p>
-      <div style="display:flex;flex-direction:column;gap:0.6rem;margin-bottom:1rem;">
-        <button class="btn btn-success btn-block" onclick="window.resolvePaddle('${ownerId}', '${cardUid}', 'raft')">
-          ⛵ 脱出用の完成イカダを ＋1艘 増やす（おすすめ！）
-        </button>
-        <button class="btn btn-primary btn-block" onclick="window.resolvePaddle('${ownerId}', '${cardUid}', 'wood')">
-          🪵 木材トラックを ＋2個 増やす
-        </button>
-      </div>
-      <button class="btn btn-secondary btn-block" onclick="window.closeItemActionModal()">キャンセル</button>
-    `);
-  }
-
   window.resolvePaddle = function (ownerId, cardUid, mode) {
     window.closeItemActionModal();
     window.SFX.play('raftBuilt');
@@ -3316,16 +3471,12 @@ window.GameData = {
       const p = draft.players.find(x => x.id === ownerId);
       if (!p) return;
       removeCardByUid(p, cardUid);
-      if (mode === 'wood') {
-        const total = draft.board.wood + 2;
-        const addRafts = Math.floor(total / 6);
-        draft.board.rafts += addRafts;
-        draft.board.wood = total % 6;
-        addLog(draft, 'success', `🛶 ${p.name} が【カヌーのパドル】を木材＋2個として使用しました！`);
-      } else {
-        draft.board.rafts += 1;
-        addLog(draft, 'success', `🛶 ${p.name} が【カヌーのパドル】を使用！ 完成イカダが＋1艘増えました（合計: ${draft.board.rafts}艘）！`);
-      }
+      // パドルは「木材1個分」としてイカダ作りに使える（木材6個でイカダ1艘完成）
+      const total = draft.board.wood + 1;
+      const addRafts = Math.floor(total / 6);
+      draft.board.rafts += addRafts;
+      draft.board.wood = total % 6;
+      addLog(draft, 'success', `🛶 ${p.name} が【カヌーのパドル】を木材1個分として使用しました！${addRafts > 0 ? ` ⛵イカダが完成！（計${draft.board.rafts}艘）` : `（木材 ${draft.board.wood}/6）`}`);
     });
   };
 
@@ -3534,16 +3685,14 @@ window.GameData = {
 
     let handWater = 0;
     let handFood = 0;
-    let handPaddles = 0;
     alivePlayers.forEach(p => {
       (p.hand || []).forEach(c => {
         if (c.typeId === 'water') handWater++;
         if (c.typeId === 'food') handFood++;
-        if (c.typeId === 'paddle') handPaddles++;
       });
     });
 
-    const totalRafts = (game.board?.rafts || 0) + handPaddles;
+    const totalRafts = game.board?.rafts || 0;
     const totalWater = (game.board?.water || 0) + handWater;
     const totalFood = (game.board?.food || 0) + handFood;
 
@@ -3628,6 +3777,20 @@ window.GameData = {
       return;
     }
 
+    // 交換提案の相手がCPUなら、少し考えてから承諾・拒否する
+    if (game.tradeOffer) {
+      const offer = game.tradeOffer;
+      const toPlayer = game.players.find(p => p.id === offer.toId);
+      if (toPlayer && toPlayer.alive && toPlayer.isCpu) {
+        AppState.cpuTimer = setTimeout(() => {
+          if (!AppState.isItemModalOpen && !AppState.isProcessingAnimation) {
+            runCpuTradeResponse(offer);
+          }
+        }, 1400);
+        return;
+      }
+    }
+
     // フェーズ2：現在の手番がCPUなら行動させる
     if (game.phase === 'action') {
       const current = game.players[game.currentTurnIndex];
@@ -3709,11 +3872,26 @@ window.GameData = {
     }
   }
 
+  function runCpuTradeResponse(offer) {
+    const game = AppState.game;
+    if (!game || !game.tradeOffer || game.tradeOffer.id !== offer.id) return;
+    const cpu = game.players.find(p => p.id === offer.toId);
+    if (!cpu || !cpu.alive) return;
+    if (cpu.hand.length > 0 && Math.random() < 0.5) {
+      // ガラクタがあればそれを優先して差し出す
+      const junk = cpu.hand.find(c => c.typeId === 'junk');
+      const pick = junk || cpu.hand[Math.floor(Math.random() * cpu.hand.length)];
+      window.acceptTrade(pick.uid);
+    } else {
+      window.declineTrade();
+    }
+  }
+
   function runCpuVote(cpu) {
     const game = AppState.game;
     if (!game || game.phase !== 'survival' || game.survivalStep !== 'vote') return;
 
-    const candidates = game.players.filter(p => p.alive && p.id !== cpu.id && !p.sleepingBagTonight);
+    const candidates = game.players.filter(p => p.alive && p.id !== cpu.id);
     if (candidates.length === 0) return;
     const poisoned = candidates.find(p => p.poisoned);
     const target = poisoned || candidates[Math.floor(Math.random() * candidates.length)];
@@ -4010,68 +4188,263 @@ window.GameData = {
   }
 
   // ============================================================
-  // 会議中・手番外でもすぐ押せる「クイックアイテム使用バー」描画
+  // 🤝 カードの交換・譲渡（追加ハウスルール）
+  // ・譲渡：自分の手札1枚を相手に無条件で渡す
+  // ・交換：自分のカード1枚を提示して提案 → 相手が自分の手札から1枚を選んで承諾（または断る）
   // ============================================================
+  window.openTradeModal = function (ownerId) {
+    if (AppState.isProcessingAnimation) return;
+    window.closeCinematicModal();
+    const game = AppState.game;
+    if (!game || game.status !== 'playing') return;
+    const owner = game.players.find(p => p.id === ownerId);
+    if (!owner || !owner.alive) return;
+    const targets = game.players.filter(p => p.alive && p.id !== ownerId);
+
+    if (owner.hand.length === 0 || targets.length === 0) {
+      openItemActionModal(`
+        <div style="font-size:2.4rem;">🤝</div>
+        <h3 style="color:#fde68a;margin:0.3rem 0;">カードの交換・譲渡</h3>
+        <p style="font-size:0.85rem;color:#cbd5e1;margin-bottom:1rem;">渡せる手札がない、または相手がいません。</p>
+        <button class="btn btn-secondary btn-block" onclick="window.closeItemActionModal()">閉じる</button>
+      `);
+      return;
+    }
+
+    const sel = owner.hand.find(c => c.uid === AppState.tradeCardUid) || null;
+    if (!sel) AppState.tradeCardUid = null;
+
+    openItemActionModal(`
+      <div style="font-size:2.2rem;">🤝</div>
+      <h3 style="color:#fde68a;margin:0.2rem 0 0.5rem;">カードの交換・譲渡</h3>
+      <div style="font-size:0.78rem;color:#fde68a;font-weight:800;text-align:left;margin-bottom:0.3rem;">① 渡すカードを選ぶ</div>
+      <div style="display:flex;flex-wrap:wrap;gap:0.35rem;margin-bottom:0.8rem;">
+        ${owner.hand.map(c => `
+          <button class="btn ${sel && sel.uid === c.uid ? 'btn-primary' : 'btn-secondary'} tiny"
+            onclick="window.tradePickCard('${owner.id}', '${c.uid}')">${c.icon} ${escapeHtml(c.name)}</button>
+        `).join('')}
+      </div>
+      <div style="font-size:0.78rem;color:#fde68a;font-weight:800;text-align:left;margin-bottom:0.3rem;">② 相手と方法を選ぶ</div>
+      <div style="display:flex;flex-direction:column;gap:0.4rem;margin-bottom:0.8rem;max-height:34vh;overflow-y:auto;">
+        ${targets.map(t => `
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:0.4rem;padding:0.35rem 0.5rem;border-radius:10px;background:rgba(255,255,255,0.06);">
+            <span style="font-size:0.82rem;font-weight:800;">${t.avatar} ${escapeHtml(t.name)} <small style="color:#94a3b8;">🃏${t.hand.length}</small></span>
+            <span style="display:flex;gap:0.3rem;">
+              <button class="btn btn-success tiny" ${sel ? '' : 'disabled'} onclick="window.giveCardTo('${owner.id}', '${t.id}')">🎁 譲渡</button>
+              <button class="btn btn-primary tiny" ${sel && t.hand.length > 0 ? '' : 'disabled'} onclick="window.proposeTradeTo('${owner.id}', '${t.id}')">🔁 交換提案</button>
+            </span>
+          </div>
+        `).join('')}
+      </div>
+      <p style="font-size:0.72rem;color:#94a3b8;margin-bottom:0.6rem;">
+        🎁 譲渡＝すぐに渡す ／ 🔁 交換提案＝相手が自分の手札から1枚を選んで承諾すると成立（断られることも）
+      </p>
+      <button class="btn btn-secondary btn-block" onclick="window.closeItemActionModal()">閉じる</button>
+    `);
+  };
+
+  window.tradePickCard = function (ownerId, uid) {
+    window.SFX.play('click');
+    AppState.tradeCardUid = uid;
+    window.openTradeModal(ownerId);
+  };
+
+  window.giveCardTo = function (ownerId, targetId) {
+    const uid = AppState.tradeCardUid;
+    if (!uid) return;
+    AppState.tradeCardUid = null;
+    window.closeItemActionModal();
+    window.SFX.play('cardDraw');
+    saveGameState(draft => {
+      const from = draft.players.find(p => p.id === ownerId);
+      const to = draft.players.find(p => p.id === targetId);
+      if (!from || !to || !from.alive || !to.alive) return;
+      const idx = from.hand.findIndex(c => c.uid === uid);
+      if (idx < 0) return;
+      const [card] = from.hand.splice(idx, 1);
+      to.hand.push(card);
+      if (draft.tradeOffer && draft.tradeOffer.cardUid === uid) draft.tradeOffer = null;
+      addLog(draft, 'warn', `🎁 ${from.name} が ${to.name} に手札を1枚譲渡しました。`);
+    });
+  };
+
+  window.proposeTradeTo = function (ownerId, targetId) {
+    const uid = AppState.tradeCardUid;
+    if (!uid) return;
+    AppState.tradeCardUid = null;
+    window.closeItemActionModal();
+    window.SFX.play('bluff');
+    saveGameState(draft => {
+      const from = draft.players.find(p => p.id === ownerId);
+      const to = draft.players.find(p => p.id === targetId);
+      if (!from || !to || !from.alive || !to.alive) return;
+      if (!from.hand.some(c => c.uid === uid)) return;
+      draft.tradeOffer = { id: 'tr_' + Date.now(), fromId: ownerId, toId: targetId, cardUid: uid };
+      addLog(draft, 'chat', `🔁 ${from.name} が ${to.name} に手札の交換を持ちかけました！`);
+    });
+  };
+
+  window.acceptTrade = function (giveUid) {
+    window.SFX.play('cardFlip');
+    saveGameState(draft => {
+      const offer = draft.tradeOffer;
+      if (!offer) return;
+      const from = draft.players.find(p => p.id === offer.fromId);
+      const to = draft.players.find(p => p.id === offer.toId);
+      if (!from || !to || !from.alive || !to.alive) {
+        draft.tradeOffer = null;
+        return;
+      }
+      const fi = from.hand.findIndex(c => c.uid === offer.cardUid);
+      if (fi < 0) {
+        draft.tradeOffer = null;
+        addLog(draft, 'warn', `⚠️ ${from.name} の交換提案は無効になりました。`);
+        return;
+      }
+      const [offered] = from.hand.splice(fi, 1);
+      to.hand.push(offered);
+      let swapped = false;
+      if (giveUid) {
+        const ti = to.hand.findIndex(c => c.uid === giveUid && c.uid !== offered.uid);
+        if (ti >= 0) {
+          const [back] = to.hand.splice(ti, 1);
+          from.hand.push(back);
+          swapped = true;
+        }
+      }
+      draft.tradeOffer = null;
+      addLog(draft, 'success', swapped
+        ? `🔁 ${from.name} と ${to.name} が手札を1枚ずつ交換しました！`
+        : `🎁 ${to.name} が ${from.name} から手札を1枚受け取りました。`);
+    });
+  };
+
+  window.declineTrade = function () {
+    window.SFX.play('click');
+    saveGameState(draft => {
+      const offer = draft.tradeOffer;
+      if (!offer) return;
+      const from = draft.players.find(p => p.id === offer.fromId);
+      const to = draft.players.find(p => p.id === offer.toId);
+      draft.tradeOffer = null;
+      addLog(draft, 'warn', `🚫 ${to ? to.name : '相手'} が ${from ? from.name : '相手'} の交換提案を断りました。`);
+    });
+  };
+
+  window.cancelTrade = function () {
+    window.SFX.play('click');
+    saveGameState(draft => {
+      const offer = draft.tradeOffer;
+      if (!offer) return;
+      const from = draft.players.find(p => p.id === offer.fromId);
+      draft.tradeOffer = null;
+      addLog(draft, 'warn', `↩️ ${from ? from.name : '相手'} が交換提案を取り消しました。`);
+    });
+  };
+
+  window.showCardInfo = function (ownerId, uid) {
+    const owner = AppState.game?.players.find(p => p.id === ownerId);
+    const c = owner?.hand.find(x => x.uid === uid);
+    if (!c) return;
+    openItemActionModal(`
+      <div style="font-size:2.6rem;">${c.icon}</div>
+      <h3 style="color:#fde68a;margin:0.3rem 0;">${escapeHtml(c.name)} <small style="color:#94a3b8;">${escapeHtml(c.enName || '')}</small></h3>
+      <div style="font-size:0.74rem;color:#94a3b8;margin-bottom:0.6rem;">${escapeHtml(c.categoryLabel || '')}</div>
+      <p style="font-size:0.88rem;color:#e2e8f0;margin-bottom:1rem;">${escapeHtml(c.desc || '')}</p>
+      <button class="btn btn-secondary btn-block" onclick="window.closeItemActionModal()">閉じる</button>
+    `);
+  };
+
+  window.setInitialHandSize = function (n) {
+    window.SFX.play('click');
+    saveGameState(draft => {
+      draft.initialHandSize = Math.max(0, Math.min(3, Number(n) || 0));
+    });
+  };
+
+  // ============================================================
+  // 画面描画（スクロール・スワイプ不要で1画面に収まるコンパクトレイアウト）
+  // ============================================================
+  function updateLayoutVars() {
+    const nav = document.querySelector('.top-navbar');
+    if (nav) {
+      document.documentElement.style.setProperty('--nav-h', nav.offsetHeight + 'px');
+    }
+  }
+  window.addEventListener('resize', updateLayoutVars);
+
+  function renderTradeBanner(game, activeMe) {
+    const offer = game.tradeOffer;
+    if (!offer || game.status !== 'playing') return '';
+    const from = game.players.find(p => p.id === offer.fromId);
+    const to = game.players.find(p => p.id === offer.toId);
+    if (!from || !to || !from.alive || !to.alive) return '';
+    const offered = from.hand.find(c => c.uid === offer.cardUid);
+    if (!offered) return '';
+
+    if (activeMe && activeMe.id === to.id) {
+      return `
+        <div class="trade-banner">
+          <div style="font-weight:800;">🔁 ${from.avatar}${escapeHtml(from.name)} から交換の提案！　提示カード：<span style="color:#fde68a;">${offered.icon} ${escapeHtml(offered.name)}</span></div>
+          <div style="display:flex;flex-wrap:wrap;gap:0.3rem;align-items:center;margin-top:0.25rem;">
+            <span style="font-size:0.72rem;color:#cbd5e1;">交換に出すカードを選んで承諾：</span>
+            ${to.hand.map(c => `<button class="btn btn-success tiny" onclick="window.acceptTrade('${c.uid}')">${c.icon} ${escapeHtml(c.name)}</button>`).join('')}
+            ${to.hand.length === 0 ? `<button class="btn btn-success tiny" onclick="window.acceptTrade(null)">もらうだけ（手札0枚）</button>` : ''}
+            <button class="btn btn-secondary tiny" onclick="window.declineTrade()">断る</button>
+          </div>
+        </div>
+      `;
+    }
+    if (activeMe && activeMe.id === from.id) {
+      return `
+        <div class="trade-banner">
+          ⏳ ${to.avatar}${escapeHtml(to.name)} に交換を提案中…
+          <button class="btn btn-secondary tiny" onclick="window.cancelTrade()">取り消す</button>
+        </div>
+      `;
+    }
+    return `<div class="trade-banner dim">🔁 ${escapeHtml(from.name)} が ${escapeHtml(to.name)} に交換を持ちかけています</div>`;
+  }
+
   function renderQuickItemBar(game, activeMe) {
     if (!activeMe || !activeMe.alive || game.status !== 'playing') return '';
     const hand = activeMe.hand || [];
     if (hand.length === 0) return '';
+    const dis = AppState.isProcessingAnimation ? 'disabled' : '';
 
     const hasGun = hand.some(c => c.typeId === 'gun');
     const hasBullet = hand.some(c => c.typeId === 'cartridge');
-    const canFire = hasGun && hasBullet;
-
-    // 種類ごとに代表的なカード1枚を抽出してワンクリックボタン化
-    const quickButtons = [];
-    if (canFire) {
-      quickButtons.push(`
-        <button type="button" class="btn btn-danger" style="padding:0.42rem 0.85rem;font-size:0.82rem;"
-          ${AppState.isProcessingAnimation ? 'disabled' : ''}
-          onclick="window.openGunTargetModal('${activeMe.id}')">
-          🔫 拳銃を発砲して射殺する！
-        </button>
-      `);
+    const btns = [];
+    if (hasGun && hasBullet) {
+      btns.push(`<button type="button" class="btn btn-danger tiny" ${dis} onclick="window.openGunTargetModal('${activeMe.id}')">🔫 発砲</button>`);
     }
-
-    const usableTypes = ['water', 'food', 'sleeping_bag', 'flashlight', 'spyglass', 'paddle', 'antivenom'];
+    const usable = ['water', 'food', 'sleeping_bag', 'flashlight', 'spyglass', 'paddle', 'antivenom'];
     const seen = new Set();
     for (const c of hand) {
-      if (usableTypes.includes(c.typeId) && !seen.has(c.typeId)) {
+      if (usable.includes(c.typeId) && !seen.has(c.typeId)) {
         seen.add(c.typeId);
-        const countSame = hand.filter(x => x.typeId === c.typeId).length;
-        quickButtons.push(`
-          <button type="button" class="btn btn-secondary" style="padding:0.4rem 0.75rem;font-size:0.8rem;border-color:${c.color};color:#fff;"
-            ${AppState.isProcessingAnimation ? 'disabled' : ''}
-            onclick="window.useHandCard('${activeMe.id}', '${c.uid}')">
-            ${c.icon} ${escapeHtml(c.name)}を使う${countSame > 1 ? ` (×${countSame})` : ''}
-          </button>
-        `);
+        const n = hand.filter(x => x.typeId === c.typeId).length;
+        btns.push(`<button type="button" class="btn btn-secondary tiny" style="border-color:${c.color};" ${dis}
+          onclick="window.useHandCard('${activeMe.id}', '${c.uid}')">${c.icon} ${escapeHtml(c.name)}${n > 1 ? '×' + n : ''}</button>`);
       }
     }
-
-    if (quickButtons.length === 0) return '';
+    btns.push(`<button type="button" class="btn btn-secondary tiny" ${dis} onclick="window.openTradeModal('${activeMe.id}')">🤝 交換・譲渡</button>`);
 
     return `
-      <div style="margin-top:0.85rem;padding:0.75rem 0.9rem;border-radius:12px;background:rgba(15,23,42,0.78);border:1px dashed rgba(245,158,11,0.5);">
-        <div style="font-size:0.78rem;color:#fde68a;font-weight:800;margin-bottom:0.45rem;">
-          ⚡ ${activeMe.avatar}${escapeHtml(activeMe.name)} の即時使用アイテム（会議中・投票前後・他人の番でもいつでも発動可）：
-        </div>
-        <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
-          ${quickButtons.join('')}
-        </div>
+      <div class="qbar">
+        <span class="qbar-label">⚡ いつでも使える：</span>
+        ${btns.join('')}
       </div>
     `;
   }
 
-  // ============================================================
-  // ゲーム画面全体の描画
-  // ============================================================
   function renderGameView() {
     const container = document.getElementById('game-stage-container');
     if (!container) return;
 
     const game = AppState.game;
     if (!game) {
+      document.body.classList.remove('board-active');
       container.innerHTML = `
         <div class="panel-card" style="text-align:center;padding:2.5rem;">
           <div style="font-size:3rem;margin-bottom:0.6rem;">🏝️</div>
@@ -4084,16 +4457,30 @@ window.GameData = {
     }
 
     if (game.status === 'waiting') {
+      document.body.classList.remove('board-active');
       renderWaitingRoom(container, game);
       return;
     }
 
+    // 再描画で入力中のチャット文が消えないように退避・復元する
+    const prevChat = document.getElementById('chat-message-input');
+    const chatValue = prevChat ? prevChat.value : '';
+    const chatFocused = prevChat && document.activeElement === prevChat;
+
     renderActiveGameBoard(container, game);
+
+    const newChat = document.getElementById('chat-message-input');
+    if (newChat && chatValue) {
+      newChat.value = chatValue;
+      if (chatFocused) newChat.focus();
+    }
+    updateLayoutVars();
   }
 
   function renderWaitingRoom(container, game) {
     const isHost = AppState.mode === 'local' || game.hostId === myClientId;
     const shareUrl = `${window.location.origin}${window.location.pathname}#room=${game.code}`;
+    const handSize = Math.max(0, Math.min(3, Number(game.initialHandSize) || 0));
 
     container.innerHTML = `
       <div class="panel-card">
@@ -4115,6 +4502,9 @@ window.GameData = {
             ` : ''}
             <button class="btn btn-secondary" onclick="window.switchMainTab('rules')">
               📖 ルール＆カード一覧を見る
+            </button>
+            <button class="btn btn-danger" onclick="window.leaveOrCloseRoom()">
+              🚪 ルーム退出・終了
             </button>
           </div>
         </div>
@@ -4143,6 +4533,16 @@ window.GameData = {
           </div>
         </div>
 
+        <div style="margin:0.8rem 0;padding:0.7rem 0.9rem;border-radius:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);">
+          <div style="font-weight:800;color:#fde68a;font-size:0.88rem;margin-bottom:0.4rem;">🃏 初手の手札枚数（ゲーム開始時に配る難破船カード）</div>
+          <div style="display:flex;gap:0.4rem;flex-wrap:wrap;align-items:center;">
+            ${[0, 1, 2, 3].map(n => `
+              <button class="btn ${handSize === n ? 'btn-primary' : 'btn-secondary'}" style="padding:0.4rem 0.9rem;" ${isHost ? '' : 'disabled'} onclick="window.setInitialHandSize(${n})">${n}枚</button>
+            `).join('')}
+            <span style="font-size:0.76rem;color:#94a3b8;">※元ルールは3枚。0枚だと「④難破船をあさる」で初めて手札が増えます。</span>
+          </div>
+        </div>
+
         <div style="display:flex;gap:0.75rem;flex-wrap:wrap;margin-top:1rem;">
           <button class="btn btn-secondary" onclick="window.addCpuPlayer()">
             🤖 CPUプレイヤーを追加
@@ -4161,6 +4561,7 @@ window.GameData = {
   }
 
   function renderActiveGameBoard(container, game) {
+    document.body.classList.add('board-active');
     const metrics = getEscapeMetrics(game);
     const currentTurnPlayer = game.players[game.currentTurnIndex];
     const activeMe = getActiveControlPlayer(game);
@@ -4173,217 +4574,160 @@ window.GameData = {
 
     const w = game.currentWeather || { icon: '🌤️', label: '快晴', rain: 1, hurricane: false };
     const roundNum = game.round || 1;
-    const weatherForecastBadge = roundNum <= 6
-      ? `<span style="color:#6ee7b7;font-weight:700;">🛡️ 嵐なし安全期間 (${roundNum}/6)</span>`
-      : `<span style="color:#fca5a5;font-weight:700;">⚠️ 嵐（ハリケーン）警戒域！</span>`;
+    const safeBadge = roundNum <= 6
+      ? `<span style="color:#6ee7b7;">🛡️ 嵐なし ${roundNum}/6</span>`
+      : `<span style="color:#fca5a5;">⚠️ 嵐に警戒</span>`;
 
     const woodDotsHtml = [0, 1, 2, 3, 4, 5].map(i =>
-      `<span class="wood-dot ${i < (game.board?.wood || 0) ? 'filled' : ''}"></span>`
+      `<span class="wood-dot ${i < (game.board?.wood || 0) ? 'filled' : ''}" style="width:8px;height:8px;"></span>`
     ).join('');
 
     const humanPlayers = game.players.filter(p => !p.isCpu);
     const showLocalSwitcher = AppState.mode === 'local' && humanPlayers.length > 1;
+    const alive = metrics.aliveCount;
+    const mark = ok => ok ? '✅' : '❌';
+    const handW = metrics.totalWater - metrics.boardWater;
+    const handF = metrics.totalFood - metrics.boardFood;
+
+    let phasePanel = '';
+    if (game.status === 'playing') {
+      phasePanel = game.phase === 'action'
+        ? renderPhase2ActionPanel(game, currentTurnPlayer, isMyTurn, activeMe)
+        : renderPhase3SurvivalPanel(game, activeMe);
+    }
 
     container.innerHTML = `
-      ${showLocalSwitcher ? `
-        <div class="panel-card" style="margin-bottom:0.85rem;padding:0.7rem 1rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;">
-          <div style="font-size:0.85rem;font-weight:800;color:#fde68a;">
-            📱 パス＆プレイ操作プレイヤー切替（手番外でも切り替えて銃・アイテム使用可）：
-          </div>
-          <div style="display:flex;gap:0.4rem;flex-wrap:wrap;">
+      <div class="gs">
+        ${showLocalSwitcher ? `
+          <div class="gs-box" style="display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap;padding:4px 8px;">
+            <span style="font-size:0.72rem;font-weight:800;color:#fde68a;">📱 操作プレイヤー：</span>
             ${humanPlayers.map(hp => `
-              <button class="btn ${activeMe?.id === hp.id ? 'btn-primary' : 'btn-secondary'}" style="padding:0.35rem 0.75rem;font-size:0.8rem;" onclick="window.selectLocalActivePlayer('${hp.id}')">
+              <button class="btn ${activeMe?.id === hp.id ? 'btn-primary' : 'btn-secondary'} tiny" onclick="window.selectLocalActivePlayer('${hp.id}')">
                 ${hp.avatar} ${escapeHtml(hp.name)}
               </button>
             `).join('')}
           </div>
-        </div>
-      ` : ''}
+        ` : ''}
 
-      <!-- 脱出可能バナー -->
-      ${game.status === 'playing' && metrics.ready ? `
-        <div class="escape-ready-banner">
-          <div>
-            <div style="font-weight:900;font-size:1.1rem;color:#6ee7b7;">⛵ 脱出条件クリア！！ 今すぐ島から脱出できます！</div>
-            <div style="font-size:0.84rem;color:#d1fae5;">
-              生存者${metrics.aliveCount}人分のイカダ（${metrics.totalRafts}艘）・水（${metrics.totalWater}個）・食料（${metrics.totalFood}個）が揃っています！
+        ${game.status === 'playing' && metrics.ready ? `
+          <div class="escape-ready-banner">
+            <div style="font-weight:900;font-size:0.9rem;color:#6ee7b7;">
+              ⛵ 脱出条件クリア！（イカダ${metrics.totalRafts}・水${metrics.totalWater}・食料${metrics.totalFood} ≧ 生存${alive}人）
+            </div>
+            <button class="btn btn-success" onclick="window.triggerIslandEscape()">⛵ 今すぐ脱出する！</button>
+          </div>
+        ` : ''}
+
+        ${game.status === 'playing' && w.hurricane ? `
+          <div class="hurricane-alert-banner">
+            <div style="font-weight:900;font-size:0.88rem;color:#fca5a5;">
+              🌀 大嵐（ハリケーン）直撃ラウンド！ このラウンドの終わりまでに脱出できなければ全員死亡！
             </div>
           </div>
-          <button class="btn btn-success" style="font-size:1.05rem;padding:0.75rem 1.5rem;" onclick="window.triggerIslandEscape()">
-            ⛵ 今すぐ島を脱出する！（勝利確定）
-          </button>
-        </div>
-      ` : ''}
+        ` : ''}
 
-      <!-- ハリケーン警報バナー -->
-      ${game.status === 'playing' && w.hurricane ? `
-        <div class="hurricane-alert-banner">
-          <div>
-            <div style="font-weight:900;font-size:1.1rem;color:#fca5a5;">🌀 緊急警報：大嵐（ハリケーン）直撃ラウンド（ラストチャンス）！！</div>
-            <div style="font-size:0.84rem;color:#fecaca;">
-              このラウンドの終わりまでに「生存者数分のイカダ・水・食料」を揃えて脱出できなければ全員死亡します！
+        ${game.status === 'finished' ? `
+          <div class="gs-box" style="border:2px solid ${game.outcome === 'victory_escape' ? '#10b981' : '#ef4444'};display:flex;align-items:center;justify-content:space-between;gap:0.5rem;flex-wrap:wrap;">
+            <div style="font-weight:900;font-size:1rem;color:${game.outcome === 'victory_escape' ? '#6ee7b7' : '#fca5a5'};">
+              ${game.outcome === 'victory_escape' ? '⛵🎉 生還勝利！ 無人島から脱出成功！！' : '🌀💀 全滅敗北… 無人島から脱出失敗'}
+            </div>
+            <div style="display:flex;gap:0.4rem;flex-wrap:wrap;">
+              <button class="btn btn-primary tiny" onclick="window.startGameSetup()">🔄 もう一度</button>
+              <button class="btn btn-secondary tiny" onclick="window.backToWaitingRoom()">🏠 ロビー</button>
+              <button class="btn btn-danger tiny" onclick="window.leaveOrCloseRoom()">🚪 終了</button>
             </div>
           </div>
-        </div>
-      ` : ''}
+        ` : ''}
 
-      <!-- 終了結果バナー -->
-      ${game.status === 'finished' ? `
-        <div class="panel-card" style="margin-bottom:1rem;border:2px solid ${game.outcome === 'victory_escape' ? '#10b981' : '#ef4444'};text-align:center;">
-          <div style="font-size:2.8rem;">${game.outcome === 'victory_escape' ? '⛵🎉🏝️' : '🌀💀🌊'}</div>
-          <h2 style="font-size:1.5rem;color:${game.outcome === 'victory_escape' ? '#6ee7b7' : '#fca5a5'};margin:0.35rem 0;">
-            ${game.outcome === 'victory_escape' ? '生還勝利！ 無人島から脱出成功！！' : '全滅敗北… 無人島から脱出失敗'}
-          </h2>
-          <div style="margin-top:0.85rem;display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap;">
-            <button class="btn btn-primary" onclick="window.startGameSetup()">🔄 同じメンバーでもう一度遊ぶ</button>
-            <button class="btn btn-secondary" onclick="window.backToWaitingRoom()">🏠 待機ロビーに戻る</button>
-          </div>
-        </div>
-      ` : ''}
+        ${renderTradeBanner(game, activeMe)}
 
-      <!-- 上部リソース＆天候ステータスバー -->
-      <div class="game-top-bar">
-        <div class="resource-stat-box stat-weather">
-          <div class="stat-icon">${w.icon}</div>
-          <div>
-            <div class="stat-label">ラウンド ${roundNum} / 天候</div>
-            <div class="stat-value" style="font-size:1.05rem;">雨量 ＋${w.rain}</div>
-            <div class="stat-sub">${escapeHtml(w.label)}<br>${weatherForecastBadge}</div>
-          </div>
-        </div>
-
-        <div class="resource-stat-box stat-water">
-          <div class="stat-icon">💧</div>
-          <div>
-            <div class="stat-label">島の水トラック</div>
-            <div class="stat-value">${metrics.boardWater} <span style="font-size:0.8rem;color:#94a3b8;">/ 必要${metrics.aliveCount}</span></div>
-            <div class="stat-sub">手札水筒込: 計${metrics.totalWater}個</div>
-          </div>
-        </div>
-
-        <div class="resource-stat-box stat-food">
-          <div class="stat-icon">🥫</div>
-          <div>
-            <div class="stat-label">島の食料トラック</div>
-            <div class="stat-value">${metrics.boardFood} <span style="font-size:0.8rem;color:#94a3b8;">/ 必要${metrics.aliveCount}</span></div>
-            <div class="stat-sub">手札缶詰込: 計${metrics.totalFood}個</div>
-          </div>
-        </div>
-
-        <div class="resource-stat-box stat-raft">
-          <div class="stat-icon">⛵</div>
-          <div>
-            <div class="stat-label">完成イカダ / 木材</div>
-            <div class="stat-value">${metrics.boardRafts}艘 <span style="font-size:0.8rem;color:#94a3b8;">/ 生存${metrics.aliveCount}人</span></div>
-            <div class="wood-dots" title="木材 ${game.board?.wood || 0} / 6個">${woodDotsHtml}</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- メイン2カラムボード -->
-      <div class="game-board-grid">
-        <!-- 左カラム：生存者一覧 ＆ フェーズ操作パネル ＆ 手札 -->
-        <div>
-          <div class="panel-card" style="margin-bottom:1rem;">
-            <div class="panel-title" style="justify-content:space-between;">
-              <span>👥 漂流サバイバー一覧（生存 ${metrics.aliveCount} / ${game.players.length}人）</span>
-              <span style="font-size:0.78rem;color:#94a3b8;">難破船山札: 残り${game.wreckageDeck?.length || 0}枚</span>
+        <div class="gs-stats">
+          <div class="st">
+            <div class="ic">${w.icon}</div>
+            <div>
+              <div class="lb">R${roundNum}｜${escapeHtml(w.label)}</div>
+              <div class="vl">雨 ＋${w.rain}</div>
+              <div class="sb">${safeBadge}</div>
             </div>
+          </div>
+          <div class="st">
+            <div class="ic">💧</div>
+            <div>
+              <div class="lb">水（必要${alive}）</div>
+              <div class="vl">${metrics.boardWater} ${mark(metrics.totalWater >= alive)}</div>
+              <div class="sb">${handW > 0 ? `手札+${handW}` : '&nbsp;'}</div>
+            </div>
+          </div>
+          <div class="st">
+            <div class="ic">🥫</div>
+            <div>
+              <div class="lb">食料（必要${alive}）</div>
+              <div class="vl">${metrics.boardFood} ${mark(metrics.totalFood >= alive)}</div>
+              <div class="sb">${handF > 0 ? `手札+${handF}` : '&nbsp;'}</div>
+            </div>
+          </div>
+          <div class="st">
+            <div class="ic">⛵</div>
+            <div>
+              <div class="lb">イカダ（必要${alive}）</div>
+              <div class="vl">${metrics.boardRafts} ${mark(metrics.totalRafts >= alive)}</div>
+              <div class="sb">🪵 <span class="wood-dots" style="display:inline-flex;margin:0;">${woodDotsHtml}</span></div>
+            </div>
+          </div>
+          <button class="gs-exit" title="ルームを退出・終了" onclick="window.leaveOrCloseRoom()">🚪</button>
+        </div>
 
-            <div class="survivors-grid">
-              ${game.players.map((p, idx) => {
-                const isTurn = game.status === 'playing' && game.phase === 'action' && idx === game.currentTurnIndex;
-                const isLeader = idx === game.startPlayerIndex;
-                const hasAxe = p.hand.some(c => c.typeId === 'axe');
-                const hasRod = p.hand.some(c => c.typeId === 'rod');
-                const hasClub = p.hand.some(c => c.typeId === 'club');
-                return `
-                  <div class="survivor-card ${isTurn ? 'current-turn' : ''} ${activeMe?.id === p.id ? 'is-me' : ''} ${!p.alive ? 'is-dead' : ''} ${p.poisoned ? 'is-poisoned' : ''}">
-                    <div class="survivor-header">
-                      <span class="survivor-avatar">${p.avatar}</span>
-                      <div style="overflow:hidden;">
-                        <div class="survivor-name">${escapeHtml(p.name)}</div>
-                        <div style="font-size:0.72rem;color:#94a3b8;">
-                          🃏 手札: <strong>${p.hand.length}枚</strong>
+        <div class="gs-mid">
+          <div class="gs-col">
+            <div class="gs-box">
+              <div class="gs-sv">
+                ${game.players.map((p, idx) => {
+                  const isTurn = game.status === 'playing' && game.phase === 'action' && idx === game.currentTurnIndex;
+                  const isLeader = idx === game.startPlayerIndex;
+                  const hasAxe = p.hand.some(c => c.typeId === 'axe');
+                  const hasRod = p.hand.some(c => c.typeId === 'rod');
+                  const hasClub = p.hand.some(c => c.typeId === 'club');
+                  return `
+                    <div class="sv ${isTurn ? 'turn' : ''} ${activeMe?.id === p.id ? 'me' : ''} ${!p.alive ? 'dead' : ''} ${p.poisoned && p.alive ? 'poison' : ''}">
+                      <span class="sv-av">${p.avatar}</span>
+                      <div style="min-width:0;">
+                        <div class="sv-name">${escapeHtml(p.name)}</div>
+                        <div class="sv-sub">🃏${p.hand.length}
+                          ${isLeader && p.alive ? '👑' : ''}${isTurn && p.alive ? '⚡' : ''}${p.poisoned && p.alive ? '🐍' : ''}${p.sleepingBagTonight && p.alive ? '🛌' : ''}${hasAxe && p.alive ? '🪓' : ''}${hasRod && p.alive ? '🎣' : ''}${hasClub && p.alive ? '🏏' : ''}${!p.alive ? '💀' : ''}
                         </div>
                       </div>
                     </div>
-                    <div class="survivor-badges">
-                      ${isLeader && p.alive ? `<span class="mini-badge leader">👑 親</span>` : ''}
-                      ${isTurn && p.alive ? `<span class="mini-badge leader">⚡ 行動中</span>` : ''}
-                      ${p.poisoned && p.alive ? `<span class="mini-badge poison">🐍 毒状態</span>` : ''}
-                      ${p.sleepingBagTonight && p.alive ? `<span class="mini-badge sleep">🛌 寝袋</span>` : ''}
-                      ${hasAxe && p.alive ? `<span class="mini-badge equip">🪓 斧</span>` : ''}
-                      ${hasRod && p.alive ? `<span class="mini-badge equip">🎣 釣竿</span>` : ''}
-                      ${hasClub && p.alive ? `<span class="mini-badge equip">🏏 棍棒</span>` : ''}
-                      ${!p.alive ? `<span class="mini-badge dead">💀 脱落</span>` : ''}
-                    </div>
-                  </div>
-                `;
-              }).join('')}
+                  `;
+                }).join('')}
+              </div>
             </div>
-
-            <!-- フェーズ2：アクションパネル または フェーズ3：サバイバル会議・投票パネル -->
-            ${game.status === 'playing' ? (
-              game.phase === 'action'
-                ? renderPhase2ActionPanel(game, currentTurnPlayer, isMyTurn, activeMe)
-                : renderPhase3SurvivalPanel(game, activeMe)
-            ) : ''}
+            ${phasePanel ? `<div class="gs-box gs-scroll">${phasePanel}</div>` : ''}
           </div>
 
-          <!-- 自分の手札カード一覧（演出処理中でなければ常時使用可能！） -->
-          ${renderMyHandSection(game, activeMe)}
+          <div class="gs-col">
+            <div class="gs-box gs-log">
+              <div style="font-size:0.74rem;font-weight:800;color:#fde68a;margin-bottom:3px;">💬 会議・ログ <span style="color:#94a3b8;font-weight:600;">（山札 残${game.wreckageDeck?.length || 0}枚）</span></div>
+              <div class="log-box">
+                ${(game.logs || []).map(l => `
+                  <div class="log-entry ${l.type || ''}">${escapeHtml(l.text)}</div>
+                `).join('')}
+              </div>
+              <div style="display:flex;gap:0.3rem;margin-top:4px;">
+                <input type="text" id="chat-message-input" class="form-input" style="padding:0.3rem 0.5rem;font-size:0.76rem;" placeholder="交渉・ハッタリ発言..." onkeydown="if(event.key==='Enter')window.sendBluffMessage();" />
+                <button class="btn btn-primary tiny" onclick="window.sendBluffMessage()">送信</button>
+              </div>
+              <div class="bluff-quick-row" style="margin-top:4px;">
+                <button class="bluff-chip" onclick="window.sendBluffMessage('俺は拳銃と弾丸を持ってるぞ…投票したら撃つからな！')">🔫 銃のハッタリ</button>
+                <button class="bluff-chip" onclick="window.sendBluffMessage('生かしてくれたら手札の水筒・缶詰を出すよ！')">💧 資源交渉</button>
+                <button class="bluff-chip" onclick="window.sendBluffMessage('みんなで協力してイカダを作ろう！')">🪵 協力</button>
+                <button class="bluff-chip" onclick="window.sendBluffMessage('あいつ手札を溜め込んでて怪しいぞ！')">🕵️ 疑惑</button>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <!-- 右カラム：脱出チェッカー ＆ 交渉・ハッタリチャット＆ログ -->
-        <div>
-          <div class="panel-card" style="margin-bottom:1rem;">
-            <div class="panel-title">⛵ 島からの脱出条件チェッカー</div>
-            <div style="font-size:0.84rem;color:#cbd5e1;display:flex;flex-direction:column;gap:0.45rem;">
-              <div style="display:flex;justify-content:space-between;">
-                <span>① イカダ数 ≧ 生存者数 (${metrics.aliveCount}人)</span>
-                <strong style="color:${metrics.totalRafts >= metrics.aliveCount ? '#6ee7b7' : '#fca5a5'};">
-                  ${metrics.totalRafts} / ${metrics.aliveCount}艘 ${metrics.totalRafts >= metrics.aliveCount ? '✅' : '❌'}
-                </strong>
-              </div>
-              <div style="display:flex;justify-content:space-between;">
-                <span>② 水 ≧ 生存者数 (ボード+手札水筒)</span>
-                <strong style="color:${metrics.totalWater >= metrics.aliveCount ? '#6ee7b7' : '#fca5a5'};">
-                  ${metrics.totalWater} / ${metrics.aliveCount}個 ${metrics.totalWater >= metrics.aliveCount ? '✅' : '❌'}
-                </strong>
-              </div>
-              <div style="display:flex;justify-content:space-between;">
-                <span>③ 食料 ≧ 生存者数 (ボード+手札缶詰)</span>
-                <strong style="color:${metrics.totalFood >= metrics.aliveCount ? '#6ee7b7' : '#fca5a5'};">
-                  ${metrics.totalFood} / ${metrics.aliveCount}個 ${metrics.totalFood >= metrics.aliveCount ? '✅' : '❌'}
-                </strong>
-              </div>
-            </div>
-            <div style="margin-top:0.75rem;padding-top:0.65rem;border-top:1px solid rgba(255,255,255,0.1);font-size:0.78rem;color:#94a3b8;">
-              💡 ヒント：もしイカダや資源が3人分しかなくて生存者が4人いる場合、銃撃や投票で1人脱落すれば即座に3人で脱出できます…！
-            </div>
-          </div>
-
-          <div class="panel-card">
-            <div class="panel-title">💬 会議・ハッタリ交渉 ＆ 島内ログ</div>
-            <div class="log-box">
-              ${(game.logs || []).map(l => `
-                <div class="log-entry ${l.type || ''}">${escapeHtml(l.text)}</div>
-              `).join('')}
-            </div>
-
-            <div style="display:flex;gap:0.45rem;margin-top:0.65rem;">
-              <input type="text" id="chat-message-input" class="form-input" placeholder="交渉・ハッタリ発言を入力..." onkeydown="if(event.key==='Enter')window.sendBluffMessage();" />
-              <button class="btn btn-primary" onclick="window.sendBluffMessage()">送信</button>
-            </div>
-
-            <div class="bluff-quick-row">
-              <button class="bluff-chip" onclick="window.sendBluffMessage('俺は拳銃と弾丸を持ってるぞ…投票したら撃つからな！')">🔫 銃のハッタリ</button>
-              <button class="bluff-chip" onclick="window.sendBluffMessage('生かしてくれたら手札の水筒・缶詰を出すよ！')">💧 資源提供交渉</button>
-              <button class="bluff-chip" onclick="window.sendBluffMessage('みんなで協力してイカダを作ろう！')">🪵 協力アピール</button>
-              <button class="bluff-chip" onclick="window.sendBluffMessage('あいつ手札を溜め込んでて怪しいぞ！')">🕵️ 疑惑をかける</button>
-            </div>
-          </div>
+        <div class="gs-box gs-hand">
+          ${renderMyHandSection(game, activeMe)}
         </div>
       </div>
     `;
@@ -4396,80 +4740,51 @@ window.GameData = {
 
     if (currentTurnPlayer.poisoned) {
       return `
-        <div style="background:rgba(88,28,135,0.3);border:1.5px solid #a855f7;border-radius:14px;padding:1rem;margin-top:0.5rem;">
-          <h4 style="color:#e9d5ff;margin-bottom:0.35rem;">🐍 ${escapeHtml(currentTurnPlayer.name)} はヘビの毒状態です！</h4>
-          <p style="font-size:0.84rem;color:#cbd5e1;margin-bottom:0.75rem;">
-            手札の「💉 ヘビの解毒剤」を使えば今すぐ治療して行動できます（使わない場合はラウンド終了時に自動回復します）。
-          </p>
-          ${isMyTurn ? `
-            <button class="btn btn-secondary" ${AppState.isProcessingAnimation ? 'disabled' : ''} onclick="window.actionSkipPoisonedTurn()">
-              🐍 行動をスキップして次へ
-            </button>
-          ` : `<div style="font-size:0.82rem;color:#fde68a;">⏳ ${escapeHtml(currentTurnPlayer.name)} の手番処理中…</div>`}
-          ${renderQuickItemBar(game, activeMe)}
-        </div>
+        <div class="phase-title">🐍 ${currentTurnPlayer.avatar} ${escapeHtml(currentTurnPlayer.name)} はヘビの毒で行動不能！</div>
+        <p class="phase-note">解毒剤（💉）があれば今すぐ治療して行動できます。使わなければこのラウンドは行動できず、ラウンド終了時に回復します。</p>
+        ${isMyTurn ? `
+          <button class="btn btn-secondary" ${AppState.isProcessingAnimation ? 'disabled' : ''} onclick="window.actionSkipPoisonedTurn()">
+            🐍 行動をスキップして次へ
+          </button>
+        ` : `<div class="phase-note" style="color:#fde68a;">⏳ ${escapeHtml(currentTurnPlayer.name)} の手番処理中…</div>`}
+        ${renderQuickItemBar(game, activeMe)}
       `;
     }
 
     return `
-      <div style="margin-top:0.6rem;">
-        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;">
-          <h4 style="color:#fde68a;font-size:1rem;">
-            ⚡ フェーズ2（アクション）：${currentTurnPlayer.avatar} ${escapeHtml(currentTurnPlayer.name)} の手番
-          </h4>
-          <span style="font-size:0.8rem;color:${isMyTurn ? '#6ee7b7' : '#94a3b8'};font-weight:700;">
-            ${isMyTurn ? '👉 あなたの番です！4つから1つ選んで実行してください' : `⏳ ${escapeHtml(currentTurnPlayer.name)} の手番（手札アイテムや銃はいつでも使用可）`}
-          </span>
-        </div>
-
-        <div class="action-cards-grid">
-          <!-- ① 水を汲む -->
-          <div class="action-choice-card ${!canActNow ? 'disabled' : ''}" onclick="${canActNow ? 'window.actionGatherWater()' : ''}">
-            <div>
-              <div class="action-choice-title">💧 ① 水を汲む</div>
-              <div class="action-choice-desc">現在の天候の雨量分だけ、ボードの「水」を増やします。</div>
-            </div>
-            <div style="font-weight:900;color:#38bdf8;font-size:0.9rem;">水 ＋${rain} 個獲得</div>
-          </div>
-
-          <!-- ② 魚を釣る -->
-          <div class="action-choice-card ${!canActNow ? 'disabled' : ''}" onclick="${canActNow ? 'window.actionCatchFish()' : ''}">
-            <div>
-              <div class="action-choice-title">🐟 ② 魚を釣る</div>
-              <div class="action-choice-desc">魚袋からボールを1個引き、出た数（1〜3匹）だけ「食料」を増やします。</div>
-            </div>
-            <div style="font-weight:900;color:#fb923c;font-size:0.9rem;">食料 ＋1〜3 個獲得</div>
-          </div>
-
-          <!-- ③ 木材を集める -->
-          <div class="action-choice-card ${!canActNow ? 'disabled' : ''}" style="cursor:default;">
-            <div>
-              <div class="action-choice-title">🪵 ③ 木材を集める</div>
-              <div class="action-choice-desc">
-                何個引くか宣言して木材袋（茶5・黒ヘビ1）から引く。6個でイカダ1艘完成！黒を引くと0個＆毒🐍！
-              </div>
-            </div>
-            <div class="wood-count-selector">
-              ${[1, 2, 3, 4, 5].map(n => `
-                <button type="button" class="wood-num-btn" ${!canActNow ? 'disabled' : ''} onclick="event.stopPropagation();window.actionGatherWood(${n})">
-                  ${n}個
-                </button>
-              `).join('')}
-            </div>
-          </div>
-
-          <!-- ④ 難破船をあさる -->
-          <div class="action-choice-card ${!canActNow ? 'disabled' : ''}" onclick="${canActNow ? 'window.actionScavengeWreck()' : ''}">
-            <div>
-              <div class="action-choice-title">📦 ④ 難破船をあさる</div>
-              <div class="action-choice-desc">難破船カードの山札から1枚引いて非公開の手札に加えます。</div>
-            </div>
-            <div style="font-weight:900;color:#fde68a;font-size:0.9rem;">手札カード ＋1 枚</div>
-          </div>
-        </div>
-
-        ${renderQuickItemBar(game, activeMe)}
+      <div class="phase-title">
+        ⚡ アクション：${currentTurnPlayer.avatar} ${escapeHtml(currentTurnPlayer.name)} の手番
+        <span style="font-size:0.7rem;font-weight:700;color:${isMyTurn ? '#6ee7b7' : '#94a3b8'};margin-left:0.4rem;">
+          ${isMyTurn ? '👉 4つから1つ選択！' : '⏳ 待機中（アイテム・銃はいつでも使用可）'}
+        </span>
       </div>
+      <div class="act-grid">
+        <div class="act ${!canActNow ? 'disabled' : ''}" onclick="${canActNow ? 'window.actionGatherWater()' : ''}">
+          <div class="t">💧 ① 水を汲む</div>
+          <div class="d">天候の雨量ぶん水が増える</div>
+          <div class="e" style="color:#38bdf8;">水 ＋${rain}</div>
+        </div>
+        <div class="act ${!canActNow ? 'disabled' : ''}" onclick="${canActNow ? 'window.actionCatchFish()' : ''}">
+          <div class="t">🐟 ② 魚を釣る</div>
+          <div class="d">魚袋から1個（1〜3匹）</div>
+          <div class="e" style="color:#fb923c;">食料 ＋1〜3</div>
+        </div>
+        <div class="act ${!canActNow ? 'disabled' : ''}" style="cursor:default;">
+          <div class="t">🪵 ③ 木材を集める</div>
+          <div class="d">袋（木5・🐍1）から1〜5個引く</div>
+          <div class="wood-count-selector">
+            ${[1, 2, 3, 4, 5].map(n => `
+              <button type="button" class="wood-num-btn" ${!canActNow ? 'disabled' : ''} onclick="event.stopPropagation();window.actionGatherWood(${n})">${n}</button>
+            `).join('')}
+          </div>
+        </div>
+        <div class="act ${!canActNow ? 'disabled' : ''}" onclick="${canActNow ? 'window.actionScavengeWreck()' : ''}">
+          <div class="t">📦 ④ 難破船をあさる</div>
+          <div class="d">カードを1枚引く</div>
+          <div class="e" style="color:#fde68a;">手札 ＋1</div>
+        </div>
+      </div>
+      ${renderQuickItemBar(game, activeMe)}
     `;
   }
 
@@ -4479,21 +4794,22 @@ window.GameData = {
     const needed = consumers.length;
     const waterShort = Math.max(0, needed - (game.board?.water || 0));
     const foodShort = Math.max(0, needed - (game.board?.food || 0));
+    const dis = AppState.isProcessingAnimation ? 'disabled' : '';
+    const isHurricane = game.currentWeather && game.currentWeather.hurricane;
 
     // 水と食料が足りている場合
     if (game.survivalStep === 'ready_to_consume') {
       return `
-        <div style="background:rgba(16,185,129,0.18);border:2px solid #10b981;border-radius:14px;padding:1.1rem;margin-top:0.75rem;">
-          <h4 style="color:#6ee7b7;font-size:1.05rem;margin-bottom:0.4rem;">🌙 フェーズ3（サバイバル会議）：全員分の水と食料が揃っています！</h4>
-          <p style="font-size:0.86rem;color:#cbd5e1;margin-bottom:0.85rem;">
-            今夜の消費量：水 ${needed}個 ／ 食料 ${needed}個（現在 水:${game.board.water} / 食料:${game.board.food}）<br>
-            このまま夜を越すか、手札の銃やアイテムを使用することもできます。
-          </p>
-          <button class="btn btn-success" ${AppState.isProcessingAnimation ? 'disabled' : ''} onclick="window.confirmSurvivalNight()">
-            🌙 水と食料を消費して次のラウンドへ進む
-          </button>
-          ${renderQuickItemBar(game, activeMe)}
-        </div>
+        <div class="phase-title" style="color:#6ee7b7;">🌙 サバイバル：全員分の水と食料が揃っています</div>
+        <p class="phase-note">
+          ${isHurricane
+            ? `🌀 ハリケーン直撃ラウンド！ 脱出条件（イカダ・水・食料が生存者数以上）を満たしていれば脱出、満たしていなければ全員死亡です。`
+            : `今夜の消費：水 ${needed} ／ 食料 ${needed}（現在 水${game.board.water}・食料${game.board.food}）。銃やアイテムも使えます。`}
+        </p>
+        <button class="btn btn-success" ${dis} onclick="window.confirmSurvivalNight()">
+          ${isHurricane ? '🌀 ラウンドを終える（脱出判定）' : '🌙 水と食料を消費して次のラウンドへ'}
+        </button>
+        ${renderQuickItemBar(game, activeMe)}
       `;
     }
 
@@ -4504,91 +4820,54 @@ window.GameData = {
       const tiedPlayers = (game.tiedIds || []).map(id => game.players.find(p => p.id === id)).filter(Boolean);
 
       return `
-        <div class="survival-vote-panel">
-          <h4 style="color:#fde047;font-size:1.08rem;margin-bottom:0.4rem;">
-            ⚖️ 同票決裁会議！ スタートプレイヤー 👑${escapeHtml(leader?.name || '')} が処刑者を決定します
-          </h4>
-          <p style="font-size:0.82rem;color:#cbd5e1;margin-bottom:0.75rem;">
-            ※決裁中も手札から「🔫拳銃」や「💧水筒・🥫缶詰」をいつでも割り込み使用できます！
-          </p>
-          <div class="vote-targets-grid">
-            ${tiedPlayers.map(tp => `
-              <button class="vote-target-btn" ${(!isLeaderMe || AppState.isProcessingAnimation) ? 'disabled' : ''} onclick="window.resolveTiebreak('${tp.id}')">
-                <span>${tp.avatar} ${escapeHtml(tp.name)}</span>
-                <span style="color:#f87171;">指名 💀</span>
-              </button>
-            `).join('')}
-          </div>
-          ${renderQuickItemBar(game, activeMe)}
+        <div class="phase-title" style="color:#fde047;">⚖️ 同票！ スタートプレイヤー 👑${escapeHtml(leader?.name || '')} が決裁します</div>
+        <div class="vote-targets-grid">
+          ${tiedPlayers.map(tp => `
+            <button class="vote-target-btn" ${(!isLeaderMe || AppState.isProcessingAnimation) ? 'disabled' : ''} onclick="window.resolveTiebreak('${tp.id}')">
+              <span>${tp.avatar} ${escapeHtml(tp.name)}</span><span style="color:#f87171;">💀指名</span>
+            </button>
+          `).join('')}
         </div>
+        ${renderQuickItemBar(game, activeMe)}
       `;
     }
 
     // 処刑直前の銃撃による反撃・割り込みチャンス
     if (game.survivalStep === 'counter_window') {
       const victim = game.players.find(p => p.id === game.condemnedId);
-
       return `
-        <div class="survival-vote-panel">
-          <h4 style="color:#fca5a5;font-size:1.1rem;margin-bottom:0.4rem;">
-            💀 投票結果：${victim ? `${victim.avatar} ${escapeHtml(victim.name)}` : ''} が生贄に選ばれました！
-          </h4>
-          <p style="font-size:0.85rem;color:#cbd5e1;margin-bottom:0.9rem;">
-            ⚠️ 処刑確定前なら、手札の「🔫拳銃＋🧨弾丸」で投票相手を返り討ちにしたり、「💧水筒・🥫缶詰・🛌寝袋」を出して助かることも可能です！
-          </p>
-          <div style="display:flex;gap:0.7rem;flex-wrap:wrap;">
-            <button class="btn btn-danger" ${AppState.isProcessingAnimation ? 'disabled' : ''} onclick="window.executeCondemnedVictim()">
-              💀 このまま処刑を確定する
-            </button>
-          </div>
-          ${renderQuickItemBar(game, activeMe)}
-        </div>
+        <div class="phase-title" style="color:#fca5a5;">💀 生贄：${victim ? `${victim.avatar} ${escapeHtml(victim.name)}` : ''} に決定！</div>
+        <p class="phase-note">処刑の前に、銃での返り討ちや、水筒・缶詰を出して助かることもできます。</p>
+        <button class="btn btn-danger" ${dis} onclick="window.executeCondemnedVictim()">💀 このまま処刑を確定する</button>
+        ${renderQuickItemBar(game, activeMe)}
       `;
     }
 
     // 通常のサバイバル会議＆指差し投票ステップ
     const myVote = activeMe && game.votes ? game.votes[activeMe.id] : null;
-    const votableTargets = alivePlayers.filter(p => !p.sleepingBagTonight);
     const votedCount = Object.keys(game.votes || {}).length;
     const allHumansVoted = alivePlayers.filter(p => !p.isCpu).every(p => game.votes && game.votes[p.id]);
 
     return `
-      <div class="survival-vote-panel">
-        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;">
-          <h4 style="color:#fca5a5;font-size:1.08rem;">
-            🗳️ フェーズ3：サバイバル会議 ＆ 生贄投票（水不足: ${waterShort} / 食料不足: ${foodShort}）
-          </h4>
-          <span style="font-size:0.78rem;color:#fde68a;">
-            投票選択済み: ${votedCount} / ${alivePlayers.length}人
-          </span>
-        </div>
-        <p style="font-size:0.83rem;color:#fecaca;margin:0.35rem 0 0.7rem;">
-          会議中に「💧水筒」「🥫缶詰」「🛌寝袋」を出すか、「🔫拳銃」で誰かを射殺して人数を減らせば投票せずに生き残れます！<br>
-          投票する場合は指差し相手を選び、「せーの！」で一斉に開票してください。
-        </p>
-
-        ${activeMe && activeMe.alive ? `
-          <div class="vote-targets-grid">
-            ${votableTargets.map(t => `
-              <button class="vote-target-btn ${myVote === t.id ? 'selected' : ''}"
-                ${AppState.isProcessingAnimation ? 'disabled' : ''}
-                onclick="window.submitMyVote('${activeMe.id}', '${t.id}')">
-                <span>${t.avatar} ${escapeHtml(t.name)}</span>
-                <span>${myVote === t.id ? '✅ 指差し中' : '👉 指差す'}</span>
-              </button>
-            `).join('')}
-          </div>
-        ` : `<div style="color:#94a3b8;font-size:0.85rem;">生存者たちの会議・投票を見守っています…</div>`}
-
-        <div style="margin-top:0.75rem;display:flex;gap:0.65rem;flex-wrap:wrap;align-items:center;">
-          <button class="btn btn-danger" ${(!allHumansVoted || AppState.isProcessingAnimation) ? 'disabled' : ''} onclick="window.revealAllVotes()">
-            👉 「せーの！」で全員の投票を開票・集計する
-          </button>
-          ${!allHumansVoted ? `<span style="font-size:0.78rem;color:#fde68a;">※まず指差す相手を1人クリックして選択してください（または下のアイテム・銃を使用）</span>` : ''}
-        </div>
-
-        ${renderQuickItemBar(game, activeMe)}
+      <div class="phase-title" style="color:#fca5a5;">
+        🗳️ サバイバル会議（水不足${waterShort} / 食料不足${foodShort}）
+        <span style="font-size:0.7rem;color:#fde68a;margin-left:0.4rem;">指差し ${votedCount}/${alivePlayers.length}人</span>
       </div>
+      <p class="phase-note">水筒・缶詰を出す、銃で誰かを撃つなどで不足を解消できます。投票するなら指差して「せーの！」で開票。</p>
+      ${activeMe && activeMe.alive ? `
+        <div class="vote-targets-grid">
+          ${alivePlayers.map(t => `
+            <button class="vote-target-btn ${myVote === t.id ? 'selected' : ''}" ${dis} onclick="window.submitMyVote('${activeMe.id}', '${t.id}')">
+              <span>${t.avatar} ${escapeHtml(t.name)}</span><span>${myVote === t.id ? '✅' : '👉'}</span>
+            </button>
+          `).join('')}
+        </div>
+      ` : `<div class="phase-note">生存者たちの会議を見守っています…</div>`}
+      <button class="btn btn-danger" ${(!allHumansVoted || AppState.isProcessingAnimation) ? 'disabled' : ''} onclick="window.revealAllVotes()">
+        👉 「せーの！」で開票する
+      </button>
+      ${!allHumansVoted ? `<span style="font-size:0.68rem;color:#fde68a;margin-left:0.3rem;">※先に指差す相手を選んでください</span>` : ''}
+      ${renderQuickItemBar(game, activeMe)}
     `;
   }
 
@@ -4597,71 +4876,59 @@ window.GameData = {
     const canShoot = activeMe.alive &&
       activeMe.hand.some(c => c.typeId === 'gun') &&
       activeMe.hand.some(c => c.typeId === 'cartridge');
-
     const itemDisabled = !activeMe.alive || game.status !== 'playing' || AppState.isProcessingAnimation;
 
-    return `
-      <div class="panel-card">
-        <div class="panel-title" style="justify-content:space-between;flex-wrap:wrap;">
-          <span>🃏 ${activeMe.avatar} ${escapeHtml(activeMe.name)} の手札（${activeMe.hand.length}枚）<small style="color:#6ee7b7;font-size:0.76rem;margin-left:0.4rem;">※処理中以外はいつでも使用可</small></span>
-          <div style="display:flex;gap:0.45rem;align-items:center;flex-wrap:wrap;">
-            ${canShoot && game.status === 'playing' ? `
-              <button class="btn btn-danger" style="padding:0.38rem 0.85rem;font-size:0.82rem;" ${itemDisabled ? 'disabled' : ''} onclick="window.openGunTargetModal('${activeMe.id}')">
-                🔫 拳銃＋弾丸で今すぐ撃つ！
-              </button>
-            ` : ''}
-            ${AppState.mode === 'local' ? `
-              <button class="btn btn-secondary" style="padding:0.3rem 0.65rem;font-size:0.76rem;" onclick="window.toggleLocalHandLock()">
-                ${AppState.localHandUnlocked ? '🙈 手札を隠す' : '👁️ 手札を表示する'}
-              </button>
-            ` : ''}
-          </div>
-        </div>
+    const header = `
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:0.4rem;flex-wrap:wrap;margin-bottom:4px;">
+        <span style="font-size:0.78rem;font-weight:800;color:#fde68a;">🃏 ${activeMe.avatar} ${escapeHtml(activeMe.name)} の手札（${activeMe.hand.length}枚）</span>
+        <span style="display:flex;gap:0.3rem;flex-wrap:wrap;">
+          ${canShoot && game.status === 'playing' ? `<button class="btn btn-danger tiny" ${itemDisabled ? 'disabled' : ''} onclick="window.openGunTargetModal('${activeMe.id}')">🔫 撃つ</button>` : ''}
+          ${activeMe.hand.length > 0 && game.status === 'playing' ? `<button class="btn btn-secondary tiny" ${itemDisabled ? 'disabled' : ''} onclick="window.openTradeModal('${activeMe.id}')">🤝 交換・譲渡</button>` : ''}
+          ${AppState.mode === 'local' ? `<button class="btn btn-secondary tiny" onclick="window.toggleLocalHandLock()">${AppState.localHandUnlocked ? '🙈 隠す' : '👁️ 表示'}</button>` : ''}
+        </span>
+      </div>
+    `;
 
-        ${AppState.mode === 'local' && !AppState.localHandUnlocked ? `
-          <div style="text-align:center;padding:1.5rem;background:rgba(0,0,0,0.3);border-radius:12px;">
-            <p style="color:#fde68a;margin-bottom:0.6rem;">🔒 覗き見防止のため手札を隠しています</p>
-            <button class="btn btn-primary" onclick="window.toggleLocalHandLock()">👁️ ${escapeHtml(activeMe.name)} の手札を見る</button>
-          </div>
-        ` : (
-          activeMe.hand.length === 0 ? `
-            <div style="padding:1.2rem;text-align:center;color:#94a3b8;font-size:0.88rem;">
-              現在手札はありません。「④ 難破船をあさる」でカードを引きましょう！
+    if (AppState.mode === 'local' && !AppState.localHandUnlocked) {
+      return `
+        ${header}
+        <div style="text-align:center;padding:0.6rem;background:rgba(0,0,0,0.3);border-radius:10px;">
+          <span style="color:#fde68a;font-size:0.78rem;margin-right:0.5rem;">🔒 覗き見防止中</span>
+          <button class="btn btn-primary tiny" onclick="window.toggleLocalHandLock()">👁️ ${escapeHtml(activeMe.name)} の手札を見る</button>
+        </div>
+      `;
+    }
+
+    if (activeMe.hand.length === 0) {
+      return `
+        ${header}
+        <div style="padding:0.4rem;text-align:center;color:#94a3b8;font-size:0.76rem;">手札なし。「④ 難破船をあさる」でカードを引けます。</div>
+      `;
+    }
+
+    return `
+      ${header}
+      <div class="hand-row">
+        ${activeMe.hand.map(c => {
+          let label = '使う';
+          let cls = 'btn-secondary';
+          if (c.typeId === 'gun' || c.typeId === 'cartridge') {
+            label = canShoot ? '🔫 撃つ' : '威嚇';
+            if (canShoot) cls = 'btn-danger';
+          } else if (c.typeId === 'junk') {
+            label = '🃏 ブラフ';
+          } else if (!c.consumable) {
+            label = '📢 見せる';
+          }
+          return `
+            <div class="hc" style="--cc:${c.color || '#f59e0b'};" title="${escapeHtml(c.desc || '')}">
+              <button type="button" class="hc-info" onclick="window.showCardInfo('${activeMe.id}', '${c.uid}')">ⓘ</button>
+              <div class="hc-icon">${c.icon}</div>
+              <div class="hc-name">${escapeHtml(c.name)}</div>
+              <button class="btn ${cls} hc-btn" ${itemDisabled ? 'disabled' : ''} onclick="window.useHandCard('${activeMe.id}', '${c.uid}')">${label}</button>
             </div>
-          ` : `
-            <div class="hand-cards-row">
-              ${activeMe.hand.map(c => {
-                let btnLabel = '✨ 今すぐ使用する';
-                if (c.typeId === 'gun' || c.typeId === 'cartridge') {
-                  btnLabel = canShoot ? '🔫 発砲ターゲット選択' : '🔫 銃の威嚇 / 確認';
-                } else if (c.typeId === 'junk') {
-                  btnLabel = '🃏 ブラフで笑う';
-                } else if (!c.consumable) {
-                  btnLabel = '📢 装備アピール';
-                }
-                return `
-                  <div class="hand-card-item" style="border-color:${c.color || '#f59e0b'};">
-                    <div>
-                      <div class="hand-card-top">
-                        <span>${escapeHtml(c.enName || '')}</span>
-                        <span>${c.consumable ? 'いつでも使用可' : '常時効果'}</span>
-                      </div>
-                      <div class="hand-card-icon">${c.icon}</div>
-                      <div class="hand-card-name">${escapeHtml(c.name)}</div>
-                      <div class="hand-card-desc">${escapeHtml(c.desc)}</div>
-                    </div>
-                    <button class="btn ${ (c.typeId === 'gun' || c.typeId === 'cartridge') && canShoot ? 'btn-danger' : 'btn-secondary' } btn-block"
-                      style="padding:0.42rem;font-size:0.78rem;"
-                      ${itemDisabled ? 'disabled' : ''}
-                      onclick="window.useHandCard('${activeMe.id}', '${c.uid}')">
-                      ${btnLabel}
-                    </button>
-                  </div>
-                `;
-              }).join('')}
-            </div>
-          `
-        )}
+          `;
+        }).join('')}
       </div>
     `;
   }
@@ -4685,6 +4952,46 @@ window.GameData = {
       draft.status = 'waiting';
       draft.phase = null;
     });
+  };
+
+  window.leaveOrCloseRoom = async function () {
+    window.SFX.play('click');
+    const game = AppState.game;
+    if (AppState.roomUnsubscribe) {
+      AppState.roomUnsubscribe();
+      AppState.roomUnsubscribe = null;
+    }
+    if (AppState.cpuTimer) {
+      clearTimeout(AppState.cpuTimer);
+      AppState.cpuTimer = null;
+    }
+
+    if (AppState.mode === 'online' && game && AppState.roomCode && window.FB && window.FB.ready) {
+      const roomRef = window.FB.ref(window.FB.db, `rooms/${AppState.roomCode}`);
+      const remainingHumans = (game.players || []).filter(p => !p.isCpu && p.id !== myClientId);
+      if (game.hostId === myClientId || remainingHumans.length === 0) {
+        // ホストまたは最後の人間が抜けた場合はFirebaseからルームデータを削除してクリーンアップ
+        try {
+          await window.FB.set(roomRef, null);
+        } catch (_) {}
+      } else {
+        // ゲスト退出時はプレイヤーリストから除外
+        const updatedPlayers = (game.players || []).filter(p => p.id !== myClientId);
+        try {
+          await window.FB.update(roomRef, {
+            players: updatedPlayers,
+            updatedAt: Date.now()
+          });
+        } catch (_) {}
+      }
+    }
+
+    AppState.game = null;
+    AppState.mode = null;
+    AppState.roomCode = null;
+    window.location.hash = '';
+    renderGameView();
+    window.switchMainTab('lobby');
   };
 
   // ============================================================
